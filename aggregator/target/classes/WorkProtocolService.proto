@@ -1,0 +1,27 @@
+syntax = "proto3";
+package com.kkennib.grpc;
+
+message Work {
+  int32 no = 1;
+  int32 groupNo = 2;
+  repeated string keywords = 3;
+  repeated string channels = 4;
+  repeated string collectionDates = 5;
+  string state = 6;
+  string message = 7;
+  repeated int32 workList = 8;
+}
+
+message WorkResponse {
+  string state = 1;
+  string message = 2;
+}
+
+service WorkProtocolService {
+  rpc greeting(Work) returns (WorkResponse) {}
+  rpc collect(Work) returns (WorkResponse) {}
+  rpc aggregate(Work) returns (WorkResponse) {}
+  rpc report(Work) returns (WorkResponse) {}
+  rpc reduce(Work) returns (WorkResponse) {}
+  rpc procReduceResult(Work) returns (WorkResponse) {}
+}
