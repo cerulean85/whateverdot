@@ -1,239 +1,196 @@
 var express = require("express")
 var router = express.Router();
-const grpc = require("@grpc/grpc-js");
-const protoLoader = require("@grpc/proto-loader");
 const config = require("../config");
 const cors = require("cors");
-const proto_path = "./proto/WorkProtocolService.proto"
-const packageDefinition = protoLoader.loadSync(
-    proto_path,
-    {
-            keepCase: true,
-            longs: String,
-            enums: String,
-            defaults: true,
-            oneofs: true
-    });
-
-
-const protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
-const kkennibGrpc = protoDescriptor.com.kkennib.grpc;
-const grpc_aggregator_stub = new kkennibGrpc.WorkProtocolService(`localhost:${config.grpc_aggregator_port}`, grpc.credentials.createInsecure());
-const grpc_collector_stub = new kkennibGrpc.WorkProtocolService(`localhost:${config.grpc_collector_port}`, grpc.credentials.createInsecure());
-
-const isErr = function (err) {
-    if (err !== null) {
-        console.log(err);
-        return true
-    }
-    return false
-}
-
-const existReponsedResult = function (res) {
-    if (res !== undefined) {
-        console.log(res);
-        return true
-    }
-    return false
-}
+const grpc = require("../routes/stub");
+const query = require("../routes/query");
+const util = require("../routes/util");
 
 function strNull(v) {
     if(v===undefined || v==='undefined') return '';
     return v;
 }
 
-const log = {
-    queryCallRequest: function (sql, addr) {
-        console.log('===> [Begin]   SQL//Addr: ' + addr);
-        console.log('===>  ↓↓↓↓↓    Request Query');
-        console.log(sql);
-        console.log('-------------------------------------------\n\n');
-    },
-    queryCallResponse: function (result, sql, addr) {
-        console.log('===> [End]    SQL//Addr: ' + addr);
-        console.log('===> ↓↓↓↓↓    Request Query');
-        console.log(sql);
-        console.log('*********  Response Data');
-        console.log(result);
-        console.log('-------------------------------------------\n\n');
-    },
-    actionCallRequest: function (data, addr) {
-        console.log('===> [Begin]   POST//Addr: ' + addr);
-        console.log('===>  ↓↓↓↓↓    Request Data');
-        console.log(data);
-        console.log('-------------------------------------------\n\n');
-    },
-    actionCallResponse: function (result, data, addr) {
-        console.log('===> [End]    POST//Addr: ' + addr);
-        console.log('===> ↓↓↓↓↓    Request Data');
-        console.log(data);
-        console.log('*********  Response Data');
-        console.log('-------------------------------------------\n\n');
-    }
-};
+router.get('/echo', function(req, res) {
+   grpc.stub.echo(res, req, function (err, proto_res) {
+       if (grpc.existReponsedResult(proto_res, err))
+           return res.send(proto_res)
+   })
+});
 
-function query(sql, addr, action) {
-    log.queryCallRequest(sql, addr);
-    config.pool.getConnection(function(err, conn) {
-        if (err) {
-            console.log('######### Error in connection database');
-            action({
-                type: 'conn',
-                message: 'Connection Error From DB',
-            }, null);
-            conn.release();
-            return;
-        }
+function generateKeywords(keywords, key_opts) {
+    let currentKeywordIndex = 0
+    const split_keywords = keywords.split(',')
+    const split_key_opts = key_opts.split(',')
 
-        conn.query(sql, function (err, result) {
-            conn.release();
-            if (err) {
-                console.log('######### Syntax Error');
-                console.log(sql);
-                action({
-                    type: 'syntax',
-                    message: 'Syntax Error From DB',
-                }, null);
-                return;
+    let currentKeywords = [split_keywords[currentKeywordIndex]]
+    for(var index=0; index<split_key_opts.length; index++) {
+        currentKeywordIndex++;
+        const targetKeyword = split_keywords[currentKeywordIndex]
+        const opt = split_key_opts[index]
+        let refreshedKeywords = [];
+        if(opt === "AND") {
+            for(var jdex=0; jdex<currentKeywords.length; jdex++) {
+                refreshedKeywords.push(currentKeywords[jdex] + ' ' + targetKeyword)
             }
-            log.queryCallResponse(result, sql, addr);
-            action({type: 'success' }, result);
-        });
-    });
-}
-
-const req_select = function (obj) {
-    query(obj.sql, obj.addr, function (err, result) {
-
-        if(err.type==='conn' || err.type==='syntax') {
-            obj.call_res.send({ err_message: err.message });
-            return;
+            currentKeywords = refreshedKeywords;
         }
-
-        let list = [];
-        result.forEach(function (item, index, array) {
-            list.push(item);
-        });
-
-        if(obj.reverse)
-            list.reverse();
-
-        obj.call_res.send({
-            err: undefined,
-            totalCount: list.length,
-            list: list
-        });
-    });
-}
-
-const req_insert = function (obj) {
-    query(obj.sql, obj.addr, function (err, result) {
-
-        if(err.type==='conn' || err.type==='syntax') {
-            obj.call_res.send({ err_message: err.message });
-            return;
+        if(opt === "OR") {
+            console.log(opt)
+            for(var jdex=0; jdex<currentKeywords.length; jdex++) {
+                refreshedKeywords.push(currentKeywords[jdex])
+                refreshedKeywords.push(currentKeywords[jdex] + ' ' + targetKeyword)
+            }
+            currentKeywords = refreshedKeywords;
         }
-        obj.call_res.send({
-            err: undefined,
-            insert_id: result.insertId
-        });
-    });
+    }
+
+    return currentKeywords
 }
 
-const req_update = function (obj) {
-    query(obj.sql, obj.addr, function (err, result) {
+router.get("/enroll_works", function(req, res){
+    req = {
+        title: "Test",
+        keywords: "A,B,C,D,X",
+        key_opts: "AND,OR,OR,AND",
+        channels: "nav,jna,twt,ins",
+        start_dt: "2020-01-01",
+        end_dt: "2020-01-30"
+    };
 
-        if(err.type==='conn' || err.type==='syntax') {
-            obj.call_res.send({ err_message: err.message });
-            return;
+    query.query_insert({
+        "addr": "/insert_work_group", "call_res": res, "reverse": false, "res_send": true,
+        "sql": `INSERT INTO work_groups(title, keywords, channels, start_dt, end_dt)
+                VALUES('${req.title}', '${req.keywords}', '${req.channels}', '${req.start_dt}', '${req.end_dt}')`,
+        "emit": function (result) {
+            const workGroupNo = result.insertId
+            const genKeywords = generateKeywords(req.keywords, req.key_opts)
+            const splitChannels = req.channels.split(',')
+
+            let sql = `INSERT INTO works(work_group_no, keyword, channel, start_dt, end_dt) VALUES`
+            for(const keyword of genKeywords) {
+                for(const channel of splitChannels) {
+                    sql += `('${workGroupNo}', '${keyword}', '${channel}', '${req.start_dt}', '${req.end_dt}'),`
+                }
+            }
+            sql = sql.slice(0, -1)
+
+            query.query_insert({
+                "addr": "/insert_works", "call_res": res, "reverse": false, "res_send": false,
+                "sql": sql, "emit": undefined
+            });
+
         }
-
-        obj.call_res.send();
     });
-}
+})
 
-const req_delete = function (obj) {
-    query(obj.sql, obj.addr, function (err, result) {
+router.get('/collect_urls', function(req, res) {
+    req = { groupNo: 9 }
+    query.query_select({
+        "addr": "/req_collect_urls", "call_res": res, "reverse": false, "res_send": false,
+        "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
+        "emit": function(result) {
+            console.log("오잉")
 
-        if(err.type==='conn' || err.type==='syntax') {
-            obj.call_res.send({ err_message: err.message });
-            return;
+            let workList = []
+            for (const work of result) {
+                workList.push({
+                    "no": work.work_no,
+                    "groupNo": work.work_group_no,
+                    "keywords": [work.keyword],
+                    "channels": [work.channel],
+                    "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
+                })
+            }
+            console.log(workList)
+            grpc.stub.collectUrls({ workList: workList }, req, function (err, proto_res) {
+                // console.log(res)
+                if (grpc.existReponsedResult(proto_res, err))
+                    return res.send(proto_res)
+            })
         }
-
-        obj.call_res.send();
-    });
-}
-
-router.get('/req_aggregate', function(req, res) {
-
-    grpc_aggregator_stub.aggregate({message: 'Nice to meet you!!'}, function (err, proto_res) {
-
-        if (isErr(err))
-            return
-
-        if (existReponsedResult(proto_res))
-            res.send(proto_res)
-
-    });
-});
-
-router.get('/req_report', function(req, res) {
-
-    grpc_aggregator_stub.report({message: 'Nice to meet you!!'}, function (err, proto_res) {
-
-        if (isErr(err))
-            return
-
-        if (existReponsedResult(proto_res))
-            res.send(proto_res)
-
-    });
-});
-
-router.get('/req_collect', function(req, res) {
-
-    grpc_collector_stub.collect({message: 'Nice to meet you!!'}, function (err, proto_res) {
-
-        if (isErr(err))
-            return
-
-        if (existReponsedResult(proto_res))
-            res.send(proto_res)
-
-    });
-});
-
-
-router.get('/test_list', function(req, res) {
-    req_select({
-        "addr": "/test_list", "call_res": res, "reverse": false,
-        "sql":`SELECT * FROM test`
     })
 });
 
-router.get('/insert_test', function(req, res) {
-    req_insert({
-        "addr": "/insert_test", "call_res": res, "reverse": false,
-        "sql": `INSERT INTO test(d2, d3, d4) VALUES(123, 'aaabbb', NOW())`
-    })
-});
+// router.get('/req_aggregate', function(req, res) {
+//
+//     stub.aggregate({message: 'Nice to meet you!!'}, function (err, proto_res) {
+//
+//         if (isErr(err))
+//             return
+//
+//         if (existReponsedResult(proto_res))
+//             res.send(proto_res)
+//
+//     });
+// });
+//
+// router.get('/req_report', function(req, res) {
+//
+//     stub.report({message: 'Nice to meet you!!'}, function (err, proto_res) {
+//
+//         if (isErr(err))
+//             return
+//
+//         if (existReponsedResult(proto_res))
+//             res.send(proto_res)
+//
+//     });
+// });
+//
 
-router.get('/update_test', function(req, res) {
-
-    const d1_no = 5
-    req_update({
-        "addr": "/update_test", "call_res": res, "reverse": false,
-        "sql": `UPDATE test SET d2=9999 WHERE d1=${d1_no}`
-    })
-});
-
-router.get('/update_delete', function(req, res) {
-
-    const d1_no = 5
-    req_update({
-        "addr": "/update_delete", "call_res": res, "reverse": false,
-        "sql": `DELETE FROM test WHERE d1=${d1_no}`
-    })
-});
+//
+// router.get('/req_collect_docs', function(req, res) {
+//
+//     req = {
+//         no: 1,
+//         groupNo: 101,
+//         keywords: ["A", "B", "C"],
+//         channels: ["nav", "jna", "twt", "ins"],
+//         message: "req_collect"
+//     }
+//     stub.collectDocs({message: 'Nice to meet you!!'}, function (err, proto_res) {
+//
+//         if (isErr(err))
+//             return
+//
+//         if (existReponsedResult(proto_res))
+//             res.send(proto_res)
+//
+//     });
+// });
+//
+//
+// router.get('/test_list', function(req, res) {
+//     req_select({
+//         "addr": "/test_list", "call_res": res, "reverse": false,
+//         "sql":`SELECT * FROM test`
+//     })
+// });
+//
+// router.get('/insert_test', function(req, res) {
+//     req_insert({
+//         "addr": "/insert_test", "call_res": res, "reverse": false,
+//         "sql": `INSERT INTO test(d2, d3, d4) VALUES(123, 'aaabbb', NOW())`
+//     })
+// });
+//
+// router.get('/update_test', function(req, res) {
+//
+//     const d1_no = 5
+//     req_update({
+//         "addr": "/update_test", "call_res": res, "reverse": false,
+//         "sql": `UPDATE test SET d2=9999 WHERE d1=${d1_no}`
+//     })
+// });
+//
+// router.get('/update_delete', function(req, res) {
+//
+//     const d1_no = 5
+//     req_update({
+//         "addr": "/update_delete", "call_res": res, "reverse": false,
+//         "sql": `DELETE FROM test WHERE d1=${d1_no}`
+//     })
+// });
 
 module.exports = router;

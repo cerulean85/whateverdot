@@ -1,0 +1,6 @@
+IP_DIRECTOR = "localhost"
+PORT_DIRECTOR = 8084
+
+IP_WORKER = "localhost"
+PORT_WORKER = 8085
+

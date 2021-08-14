@@ -7,12 +7,12 @@ from proto import WorkProtocolService_pb2
 from proto import WorkProtocolService_pb2_grpc
 
 
-def start_rpc_server():
-    print("Started gRPC Server...")
+def start_rpc_server(addr, port):
+    print("Started gRPC Server... {}:{}".format(addr, port))
     proc = WorkProtocol()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     WorkProtocolService_pb2_grpc.add_WorkProtocolServiceServicer_to_server(proc, server)
-    server.add_insecure_port('localhost:8083')
+    server.add_insecure_port("{}:{}".format(addr, port))
     server.start()
     server.wait_for_termination()
 

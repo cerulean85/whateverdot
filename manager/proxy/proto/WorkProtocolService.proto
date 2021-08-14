@@ -9,7 +9,10 @@ message Work {
   repeated string collectionDates = 5;
   string state = 6;
   string message = 7;
-  repeated int32 workList = 8;
+}
+
+message Works {
+  repeated Work workList = 1;
 }
 
 message WorkResponse {
@@ -18,10 +21,7 @@ message WorkResponse {
 }
 
 service WorkProtocolService {
-  rpc greeting(Work) returns (WorkResponse) {}
-  rpc collect(Work) returns (WorkResponse) {}
-  rpc aggregate(Work) returns (WorkResponse) {}
-  rpc report(Work) returns (WorkResponse) {}
-  rpc reduce(Work) returns (WorkResponse) {}
-  rpc procReduceResult(Work) returns (WorkResponse) {}
+  rpc echo(Work) returns (WorkResponse);
+  rpc collectUrls(Works) returns (WorkResponse);
+  rpc collectDocs(Work) returns (WorkResponse);
 }
