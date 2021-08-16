@@ -26,7 +26,7 @@ class WorkProtocolServiceStub(object):
                 )
         self.collectDocs = channel.unary_unary(
                 '/com.kkennib.grpc.WorkProtocolService/collectDocs',
-                request_serializer=proto_dot_WorkProtocolService__pb2.Work.SerializeToString,
+                request_serializer=proto_dot_WorkProtocolService__pb2.Works.SerializeToString,
                 response_deserializer=proto_dot_WorkProtocolService__pb2.WorkResponse.FromString,
                 )
 
@@ -67,7 +67,7 @@ def add_WorkProtocolServiceServicer_to_server(servicer, server):
             ),
             'collectDocs': grpc.unary_unary_rpc_method_handler(
                     servicer.collectDocs,
-                    request_deserializer=proto_dot_WorkProtocolService__pb2.Work.FromString,
+                    request_deserializer=proto_dot_WorkProtocolService__pb2.Works.FromString,
                     response_serializer=proto_dot_WorkProtocolService__pb2.WorkResponse.SerializeToString,
             ),
     }
@@ -126,7 +126,7 @@ class WorkProtocolService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/com.kkennib.grpc.WorkProtocolService/collectDocs',
-            proto_dot_WorkProtocolService__pb2.Work.SerializeToString,
+            proto_dot_WorkProtocolService__pb2.Works.SerializeToString,
             proto_dot_WorkProtocolService__pb2.WorkResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

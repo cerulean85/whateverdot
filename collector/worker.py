@@ -1,7 +1,8 @@
 from modules import network as net
-import config as cfg
+import config
 
 if __name__ == '__main__':
-    net.start_rpc_server(cfg.IP_WORKER, cfg.PORT_WORKER)
+    conf = config.get_config()
+    net.start_rpc_server(conf["server"]["worker"]["addr"], conf["server"]["worker"]["port"])
 
 

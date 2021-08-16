@@ -1,1 +1,1 @@
-from .Collector import *
+from modules.collect.Collector import *

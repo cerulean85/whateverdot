@@ -90,7 +90,6 @@ router.get('/collect_urls', function(req, res) {
         "addr": "/req_collect_urls", "call_res": res, "reverse": false, "res_send": false,
         "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
         "emit": function(result) {
-            console.log("오잉")
 
             let workList = []
             for (const work of result) {
@@ -104,7 +103,32 @@ router.get('/collect_urls', function(req, res) {
             }
             console.log(workList)
             grpc.stub.collectUrls({ workList: workList }, req, function (err, proto_res) {
-                // console.log(res)
+                if (grpc.existReponsedResult(proto_res, err))
+                    return res.send(proto_res)
+            })
+        }
+    })
+});
+
+router.get('/collect_docs', function(req, res) {
+    req = { groupNo: 9 }
+    query.query_select({
+        "addr": "/req_collect_docs", "call_res": res, "reverse": false, "res_send": false,
+        "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
+        "emit": function(result) {
+
+            let workList = []
+            for (const work of result) {
+                workList.push({
+                    "no": work.work_no,
+                    "groupNo": work.work_group_no,
+                    "keywords": [work.keyword],
+                    "channels": [work.channel],
+                    "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
+                })
+            }
+            console.log(workList)
+            grpc.stub.collectDocs({ workList: workList }, req, function (err, proto_res) {
                 if (grpc.existReponsedResult(proto_res, err))
                     return res.send(proto_res)
             })

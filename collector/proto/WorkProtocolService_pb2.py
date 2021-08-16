@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x1fproto/WorkProtocolService.proto\x12\x10\x63om.kkennib.grpc\"\x80\x01\n\x04Work\x12\n\n\x02no\x18\x01 \x01(\x05\x12\x0f\n\x07groupNo\x18\x02 \x01(\x05\x12\x10\n\x08keywords\x18\x03 \x03(\t\x12\x10\n\x08\x63hannels\x18\x04 \x03(\t\x12\x17\n\x0f\x63ollectionDates\x18\x05 \x03(\t\x12\r\n\x05state\x18\x06 \x01(\t\x12\x0f\n\x07message\x18\x07 \x01(\t\"1\n\x05Works\x12(\n\x08workList\x18\x01 \x03(\x0b\x32\x16.com.kkennib.grpc.Work\".\n\x0cWorkResponse\x12\r\n\x05state\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t2\xe4\x01\n\x13WorkProtocolService\x12>\n\x04\x65\x63ho\x12\x16.com.kkennib.grpc.Work\x1a\x1e.com.kkennib.grpc.WorkResponse\x12\x46\n\x0b\x63ollectUrls\x12\x17.com.kkennib.grpc.Works\x1a\x1e.com.kkennib.grpc.WorkResponse\x12\x45\n\x0b\x63ollectDocs\x12\x16.com.kkennib.grpc.Work\x1a\x1e.com.kkennib.grpc.WorkResponseb\x06proto3'
+  serialized_pb=b'\n\x1fproto/WorkProtocolService.proto\x12\x10\x63om.kkennib.grpc\"\x80\x01\n\x04Work\x12\n\n\x02no\x18\x01 \x01(\x05\x12\x0f\n\x07groupNo\x18\x02 \x01(\x05\x12\x10\n\x08keywords\x18\x03 \x03(\t\x12\x10\n\x08\x63hannels\x18\x04 \x03(\t\x12\x17\n\x0f\x63ollectionDates\x18\x05 \x03(\t\x12\r\n\x05state\x18\x06 \x01(\t\x12\x0f\n\x07message\x18\x07 \x01(\t\"1\n\x05Works\x12(\n\x08workList\x18\x01 \x03(\x0b\x32\x16.com.kkennib.grpc.Work\".\n\x0cWorkResponse\x12\r\n\x05state\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t2\xe5\x01\n\x13WorkProtocolService\x12>\n\x04\x65\x63ho\x12\x16.com.kkennib.grpc.Work\x1a\x1e.com.kkennib.grpc.WorkResponse\x12\x46\n\x0b\x63ollectUrls\x12\x17.com.kkennib.grpc.Works\x1a\x1e.com.kkennib.grpc.WorkResponse\x12\x46\n\x0b\x63ollectDocs\x12\x17.com.kkennib.grpc.Works\x1a\x1e.com.kkennib.grpc.WorkResponseb\x06proto3'
 )
 
 
@@ -206,7 +206,7 @@ _WORKPROTOCOLSERVICE = _descriptor.ServiceDescriptor(
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=284,
-  serialized_end=512,
+  serialized_end=513,
   methods=[
   _descriptor.MethodDescriptor(
     name='echo',
@@ -233,7 +233,7 @@ _WORKPROTOCOLSERVICE = _descriptor.ServiceDescriptor(
     full_name='com.kkennib.grpc.WorkProtocolService.collectDocs',
     index=2,
     containing_service=None,
-    input_type=_WORK,
+    input_type=_WORKS,
     output_type=_WORKRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,

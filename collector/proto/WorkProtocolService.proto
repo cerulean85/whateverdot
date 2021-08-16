@@ -23,5 +23,5 @@ message WorkResponse {
 service WorkProtocolService {
   rpc echo(Work) returns (WorkResponse);
   rpc collectUrls(Works) returns (WorkResponse);
-  rpc collectDocs(Work) returns (WorkResponse);
+  rpc collectDocs(Works) returns (WorkResponse);
 }

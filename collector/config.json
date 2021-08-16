@@ -1,0 +1,61 @@
+{
+  "server": {
+    "director": {
+      "addr": "localhost",
+      "port": 8084
+    },
+    "worker": {
+      "addr": "localhost",
+      "port": 8085
+    }
+  },
+
+  "storage": {
+    "save_dir": "D:/__programming/wed_storage/"
+  },
+
+  "chrome_driver": {
+    "path": "C:/chromedriver_win32/chromedriver.exe"
+  },
+
+  "ins": {
+    "domain": "https://www.instagram.com/",
+    "delay_time": 3,
+    "account": {
+      "id": "zhwan85@gmail.com",
+      "pass": "!Wlsghks39682"
+    }
+  },
+
+  "nav": {
+    "delay_time": 3,
+    "seed": {
+      "probe": "https://section.blog.naver.com/Search/Post.nhn?pageNo=1&rangeType=PERIOD&orderBy=date&startDate=%s&endDate=%s&keyword=%s",
+      "collect": "https://section.blog.naver.com/Search/Post.nhn?pageNo=%s&rangeType=PERIOD&orderBy=date&startDate=%s&endDate=%s&keyword=%s"
+    }
+  },
+
+  "jna": {
+    "delay_time": 3,
+    "seed": {
+      "probe": "https://news.joins.com/Search/JoongangNews?StartSearchDate=%s&EndSearchDate=%s&Keyword=%s&SortType=New&SearchCategoryType=JoongangNews&PeriodType=DirectInput&ScopeType=All&ServiceCode=&SourceGroupType=&ReporterCode=&ImageType=All&JplusType=All&BlogType=All&ImageSearchType=Image&MatchKeyword=&IncludeKeyword=&ExcluedeKeyword=",
+      "collect": "https://news.joins.com/Search/JoongangNews?page=%s&Keyword=%s&PeriodType=DirectInput&StartSearchDate=%s&EndSearchDate=%s&SortType=New&SearchCategoryType=JoongangNews"
+    }
+  },
+
+  "dna": {
+    "delay_time": 3,
+    "seed": {
+      "probe": "https://www.donga.com/news/search?check_news=1&more=1&sorting=1&range=1&search_date=5&v1=%s&v2=%s&query=%s",
+      "collect": "https://www.donga.com/news/search?p=%s&query=%s&check_news=1&more=1&sorting=1&range=1&search_date=5&v1=%s&v2=%s"
+    }
+  },
+
+  "chs": {
+    "delay_time": 3,
+    "seed": {
+      "probe": "https://search.naver.com/search.naver?where=news&query=%s&sm=tab_opt&sort=0&photo=0&field=0&reporter_article=&pd=3&ds=%s&de=%s&docid=&nso=so:r,p:from%sto%s,a:all&mynews=1&refresh_start=0&related=0",
+      "collect": "https://search.naver.com/search.naver?where=news&query=%s&sm=tab_opt&sort=0&photo=0&field=0&reporter_article=&pd=3&ds=%s&de=%s&docid=&nso=so:r,p:from%sto%s,a:all&mynews=1&refresh_start=0&related=0"
+    }
+  }
+}
