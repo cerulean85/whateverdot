@@ -3,14 +3,12 @@ import re
 import time
 from abc import ABC
 
-from selenium import webdriver
 from bs4 import BeautifulSoup
 import config as cfg
 import modules.collect.dir as dir
 
 # import dbconn
 from modules.collect.scrap.SCScrapper import SCScrapper
-from modules.dbconn import DBHandler
 
 
 class SCBlogNaver(SCScrapper, ABC):
@@ -20,9 +18,8 @@ class SCBlogNaver(SCScrapper, ABC):
         self.chromeDriver = cfg.get_chrome_driver(config_path=dir.config_path)
 
     def collect_probed_urls(self):
-        self._probe()
+        # self._probe()
         self._collect_urls()
-        print("AAA")
         self.chromeDriver.quit()
 
     def _probe(self):
@@ -66,7 +63,9 @@ class SCBlogNaver(SCScrapper, ABC):
 
     def _collect_urls(self):
 
-        for target_page_no in range(1, self.pred_total_page_count + 1):
+        target_page_no = 1
+        while True:
+        # for target_page_no in range(1, self.pred_total_page_count + 1):
             try:
                 url_set = self._get_url(target_page_no)
 
@@ -75,14 +74,19 @@ class SCBlogNaver(SCScrapper, ABC):
                     url_o_list.append(url)
 
                 if len(url_o_list) > 0:
-                    DBHandler().insert_urls(url_o_list, self.work)
+                    # DBHandler().insert_urls(url_o_list, self.work)
+                    # Kafka
                     print("Inserted {} URLS: {}".format(self.channel, len(url_o_list)))
 
-                if target_page_no == 572:
-                    break
+                target_page_no += 1
 
             except Exception as e:
                 print(e)
+
+                    # if target_page_no == 572:
+                    #     break
+
+
 
 
 # if __name__ == "__main__":

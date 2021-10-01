@@ -1,4 +1,4 @@
-from modules import network as net
+import network as net
 import config
 
 if __name__ == '__main__':

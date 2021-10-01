@@ -2,30 +2,6 @@ import json
 from urllib import parse
 from selenium import webdriver
 
-# IP_DIRECTOR = "localhost"
-# PORT_DIRECTOR = 8084
-#
-# IP_WORKER = "localhost"
-# PORT_WORKER = 8085
-
-# KEYWORD = "코로나_백신"
-# START_DATE = "2021-02-26"
-# END_DATE = "2021-06-30"
-# START_DATE = "2020-01-01"
-# END_DATE = "2020-08-31"
-
-# FACEBOOK_START_YEAR = "2020"
-# FACEBOOK_END_YEAR = "2021"
-#
-# INSTAGRAM_DELAY_TIME = 3
-# SAVE_DIR = "D:/__programming/wed_storage/"
-# CHROME_PATH = "C:/chromedriver_win32/chromedriver.exe"
-# DELAY_SECONDS = 5
-#
-#
-# INSTAGRAM_DOMAIN = "https://www.instagram.com/"
-# INSTAGRAM_ACCOUNT_ID = "zhwan85@gmail.com"
-# INSTAGRAM_ACCOUNT_PASS = "!Wlsghks39682"
 
 def get_config(path=''):
     with open(path + "config.json", "r") as st_json:
