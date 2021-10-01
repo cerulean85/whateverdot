@@ -98,129 +98,133 @@ router.post("/enroll_works", function(req, res){
         "sql": `INSERT INTO work_groups(title, keywords, key_opts, channels, start_dt, end_dt, work_state)
                 VALUES('${req.body.title}', '${req.body.keywords}', '${req.body.key_opts}', '${req.body.channels}', '${req.body.start_dt}', '${req.body.end_dt}', 'waiting')`,
         "emit": function (result) {
-            const workGroupNo = result.insertId
-            const genKeywords = generateKeywords(req.body.keywords, req.body.key_opts)
-            const splitChannels = req.body.channels.split(',')
-
-            let sql = `INSERT INTO works(work_group_no, keyword, channel, start_dt, end_dt) VALUES`
-            for(const keyword of genKeywords) {
-                for(const channel of splitChannels) {
-                    sql += `('${workGroupNo}', '${keyword}', '${channel}', '${req.body.start_dt}', '${req.body.end_dt}'),`
-                }
-            }
-            sql = sql.slice(0, -1)
-
-            query.query_insert({
-                "addr": "/insert_works", "call_res": res, "reverse": false, "res_send": false,
-                "sql": sql, "emit": undefined
-            });
+            // const workGroupNo = result.insertId
+            // const genKeywords = generateKeywords(req.body.keywords, req.body.key_opts)
+            // const splitChannels = req.body.channels.split(',')
+            //
+            // let sql = `INSERT INTO works(work_group_no, keyword, channel, start_dt, end_dt) VALUES`
+            // for(const keyword of genKeywords) {
+            //     for(const channel of splitChannels) {
+            //         sql += `('${workGroupNo}', '${keyword}', '${channel}', '${req.body.start_dt}', '${req.body.end_dt}'),`
+            //     }
+            // }
+            // sql = sql.slice(0, -1)
+            //
+            // query.query_insert({
+            //     "addr": "/insert_works", "call_res": res, "reverse": false, "res_send": false,
+            //     "sql": sql, "emit": undefined
+            // });
         }
     });
 })
 
-router.get('/collect_urls', function(req, res) {
-    req = { groupNo: 9 }
-    query.query_select({
-        "addr": "/req_collect_urls", "call_res": res, "reverse": false, "res_send": false,
-        "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
-        "emit": function(result) {
+router.post("/route_monitor", function(req, res){
 
-            let workList = []
-            for (const work of result) {
-                workList.push({
-                    "no": work.work_no,
-                    "groupNo": work.work_group_no,
-                    "keywords": [work.keyword],
-                    "channels": [work.channel],
-                    "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
-                })
-            }
-            console.log(workList)
-            grpc.stub.collectUrls({ workList: workList }, req, function (err, proto_res) {
-                if (grpc.existReponsedResult(proto_res, err))
-                    return res.send(proto_res)
-            })
-        }
-    })
-});
+})
 
-router.get('/collect_docs', function(req, res) {
-    req = { groupNo: 9 }
-    query.query_select({
-        "addr": "/req_collect_docs", "call_res": res, "reverse": false, "res_send": false,
-        "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
-        "emit": function(result) {
-
-            let workList = []
-            for (const work of result) {
-                workList.push({
-                    "no": work.work_no,
-                    "groupNo": work.work_group_no,
-                    "keywords": [work.keyword],
-                    "channels": [work.channel],
-                    "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
-                })
-            }
-            console.log(workList)
-            grpc.stub.collectDocs({ workList: workList }, req, function (err, proto_res) {
-                if (grpc.existReponsedResult(proto_res, err))
-                    return res.send(proto_res)
-            })
-        }
-    })
-});
-
-router.get('/extract_texts', function(req, res) {
-    req = { groupNo: 9 }
-    query.query_select({
-        "addr": "/req_extract_texts", "call_res": res, "reverse": false, "res_send": false,
-        "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
-        "emit": function(result) {
-
-            let workList = []
-            for (const work of result) {
-                workList.push({
-                    "no": work.work_no,
-                    "groupNo": work.work_group_no,
-                    "keywords": [work.keyword],
-                    "channels": [work.channel],
-                    "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
-                })
-            }
-            console.log(workList)
-            grpc.stub.extractTexts({ workList: workList }, req, function (err, proto_res) {
-                if (grpc.existReponsedResult(proto_res, err))
-                    return res.send(proto_res)
-            })
-        }
-    })
-});
-
-router.get('/extract_contents', function(req, res) {
-    req = { groupNo: 9 }
-    query.query_select({
-        "addr": "/req_extract_contents", "call_res": res, "reverse": false, "res_send": false,
-        "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
-        "emit": function(result) {
-
-            let workList = []
-            for (const work of result) {
-                workList.push({
-                    "no": work.work_no,
-                    "groupNo": work.work_group_no,
-                    "keywords": [work.keyword],
-                    "channels": [work.channel],
-                    "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
-                })
-            }
-            console.log(workList)
-            grpc.stub.extractContents({ workList: workList }, req, function (err, proto_res) {
-                if (grpc.existReponsedResult(proto_res, err))
-                    return res.send(proto_res)
-            })
-        }
-    })
-});
+// router.get('/collect_urls', function(req, res) {
+//     req = { groupNo: 9 }
+//     query.query_select({
+//         "addr": "/req_collect_urls", "call_res": res, "reverse": false, "res_send": false,
+//         "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
+//         "emit": function(result) {
+//
+//             let workList = []
+//             for (const work of result) {
+//                 workList.push({
+//                     "no": work.work_no,
+//                     "groupNo": work.work_group_no,
+//                     "keywords": [work.keyword],
+//                     "channels": [work.channel],
+//                     "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
+//                 })
+//             }
+//             console.log(workList)
+//             grpc.stub.collectUrls({ workList: workList }, req, function (err, proto_res) {
+//                 if (grpc.existReponsedResult(proto_res, err))
+//                     return res.send(proto_res)
+//             })
+//         }
+//     })
+// });
+//
+// router.get('/collect_docs', function(req, res) {
+//     req = { groupNo: 9 }
+//     query.query_select({
+//         "addr": "/req_collect_docs", "call_res": res, "reverse": false, "res_send": false,
+//         "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
+//         "emit": function(result) {
+//
+//             let workList = []
+//             for (const work of result) {
+//                 workList.push({
+//                     "no": work.work_no,
+//                     "groupNo": work.work_group_no,
+//                     "keywords": [work.keyword],
+//                     "channels": [work.channel],
+//                     "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
+//                 })
+//             }
+//             console.log(workList)
+//             grpc.stub.collectDocs({ workList: workList }, req, function (err, proto_res) {
+//                 if (grpc.existReponsedResult(proto_res, err))
+//                     return res.send(proto_res)
+//             })
+//         }
+//     })
+// });
+//
+// router.get('/extract_texts', function(req, res) {
+//     req = { groupNo: 9 }
+//     query.query_select({
+//         "addr": "/req_extract_texts", "call_res": res, "reverse": false, "res_send": false,
+//         "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
+//         "emit": function(result) {
+//
+//             let workList = []
+//             for (const work of result) {
+//                 workList.push({
+//                     "no": work.work_no,
+//                     "groupNo": work.work_group_no,
+//                     "keywords": [work.keyword],
+//                     "channels": [work.channel],
+//                     "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
+//                 })
+//             }
+//             console.log(workList)
+//             grpc.stub.extractTexts({ workList: workList }, req, function (err, proto_res) {
+//                 if (grpc.existReponsedResult(proto_res, err))
+//                     return res.send(proto_res)
+//             })
+//         }
+//     })
+// });
+//
+// router.get('/extract_contents', function(req, res) {
+//     req = { groupNo: 9 }
+//     query.query_select({
+//         "addr": "/req_extract_contents", "call_res": res, "reverse": false, "res_send": false,
+//         "sql": `SELECT * FROM works WHERE work_group_no=${req.groupNo}`,
+//         "emit": function(result) {
+//
+//             let workList = []
+//             for (const work of result) {
+//                 workList.push({
+//                     "no": work.work_no,
+//                     "groupNo": work.work_group_no,
+//                     "keywords": [work.keyword],
+//                     "channels": [work.channel],
+//                     "collectionDates": [util.dateFormatting(work.start_dt), util.dateFormatting(work.end_dt)]
+//                 })
+//             }
+//             console.log(workList)
+//             grpc.stub.extractContents({ workList: workList }, req, function (err, proto_res) {
+//                 if (grpc.existReponsedResult(proto_res, err))
+//                     return res.send(proto_res)
+//             })
+//         }
+//     })
+// });
 
 // router.get('/req_aggregate', function(req, res) {
 //

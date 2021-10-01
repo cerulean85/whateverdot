@@ -2,7 +2,7 @@ const dbconn = require("mysql");
 const config = {
     pool : dbconn.createPool({
         connectionLimit : 100,
-        host: 'localhost',
+        host: '15.165.101.124',
         port: 3306,
         user: 'tester',
         password: '123456',
